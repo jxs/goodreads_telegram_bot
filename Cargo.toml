@@ -7,28 +7,14 @@ edition = "2018"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-tokio = { git = "https://github.com/tokio-rs/tokio.git", rev = "6cbe3d4f82f2c10be108366ece63e1fb180c90b9" }
-telegram-bot = { git = "https://github.com/jxs/telegram-bot", rev = "a58223f90c23c77abafb88173bbb9e1f078e8c48"}
-hyper = { git = "https://github.com/hyperium/hyper.git", rev = "a543c8eef2046999b54978cfc91be2663b743b23" }
-hyper-tls = { git = "https://github.com/hyperium/hyper-tls.git", rev = "2e4e2125180342f5c632ea24caed1b60e956691e" }
-futures-preview = "=0.3.0-alpha.17"
-log = "0.4.8"
+tokio = "0.2.0-alpha.2"
+telegram-bot = { git = "https://github.com/telegram-rs/telegram-bot/" }
+hyper = { git = "https://github.com/hyperium/hyper.git"}
+hyper-tls = { git = "https://github.com/hyperium/hyper-tls.git"}
+futures-preview = "=0.3.0-alpha.18"
 env_logger = "0.6.2"
+log = "0.4.8"
 serde = { version = "1.0", features = ["derive"] }
 serde-xml-rs = "0.3.1"
 failure = "0.1.5"
 urlencoding = "1.0.0"
-
-[patch."https://github.com/tokio-rs/tokio"]
-tokio = { git = "https://github.com/tokio-rs/tokio.git", rev = "6cbe3d4f82f2c10be108366ece63e1fb180c90b9" }
-tokio-executor = { git = "https://github.com/tokio-rs/tokio.git", rev = "6cbe3d4f82f2c10be108366ece63e1fb180c90b9" }
-tokio-io = { git = "https://github.com/tokio-rs/tokio.git", rev = "6cbe3d4f82f2c10be108366ece63e1fb180c90b9" }
-tokio-reactor = { git = "https://github.com/tokio-rs/tokio.git", rev = "6cbe3d4f82f2c10be108366ece63e1fb180c90b9" }
-tokio-sync = { git = "https://github.com/tokio-rs/tokio.git", rev = "6cbe3d4f82f2c10be108366ece63e1fb180c90b9" }
-tokio-tcp = { git = "https://github.com/tokio-rs/tokio.git", rev = "6cbe3d4f82f2c10be108366ece63e1fb180c90b9" }
-tokio-timer = { git = "https://github.com/tokio-rs/tokio.git", rev = "6cbe3d4f82f2c10be108366ece63e1fb180c90b9" }
-tokio-threadpool = { git = "https://github.com/tokio-rs/tokio.git", rev = "6cbe3d4f82f2c10be108366ece63e1fb180c90b9" }
-tokio-tls = { git = "https://github.com/tokio-rs/tokio.git", rev = "6cbe3d4f82f2c10be108366ece63e1fb180c90b9" }
-
-[patch."https://github.com/hyperium/hyper"]
-hyper = { git = "https://github.com/hyperium/hyper.git", rev = "a543c8eef2046999b54978cfc91be2663b743b23" }

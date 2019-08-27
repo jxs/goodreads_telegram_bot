@@ -37,6 +37,7 @@ pub struct Book {
     pub small_image_url: String,
 }
 
+#[derive(Clone, Debug, Default)]
 pub struct Api {
     token: String,
 }

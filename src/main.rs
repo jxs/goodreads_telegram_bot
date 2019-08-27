@@ -1,11 +1,9 @@
-#![feature(async_await)]
-
 mod goodreads;
 
 use futures::StreamExt;
 use goodreads::Api as GoodReadsApi;
 use telegram_bot::{
-    Api as TelegramBotApi, CanAnswerInlineQuery, CanReplySendMessage, Update, UpdateKind,
+    Api as TelegramBotApi, CanAnswerInlineQuery, CanReplySendMessage, InlineQuery, Update, UpdateKind,
 };
 
 #[tokio::main]
@@ -26,19 +24,7 @@ async fn main() {
             Ok(Update {
                 kind: UpdateKind::InlineQuery(query),
                 ..
-            }) => match goodreads_api.search(&query.query).await {
-                Ok(results) => {
-                    let reply = query.answer(results);
-                    let res = telegram_api.send(reply).await;
-                    if let Err(err) = res {
-                        log::error!("telegram bot send error, {:?}", err);
-                    }
-                }
-                Err(err) => {
-                    log::error!("update error, {}", err);
-                    continue;
-                }
-            },
+            }) =>{tokio::spawn(get_query_send_response(telegram_api.clone(), goodreads_api.clone(), query));},
             Ok(Update {
                 kind: UpdateKind::Message(message),
                 ..
@@ -56,6 +42,22 @@ async fn main() {
                 log::error!("update error, {}", err);
             }
             _ => {}
+        }
+    }
+}
+
+
+async fn get_query_send_response(telegram_api: TelegramBotApi, goodreads_api: GoodReadsApi, query: InlineQuery) {
+    match goodreads_api.search(&query.query).await {
+        Ok(results) => {
+            let reply = query.answer(results);
+            let res = telegram_api.send(reply).await;
+            if let Err(err) = res {
+                log::error!("telegram bot send error, {:?}", err);
+            }
+        }
+        Err(err) => {
+            log::error!("update error, {}", err);
         }
     }
 }
