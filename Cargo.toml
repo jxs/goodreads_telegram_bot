@@ -8,9 +8,8 @@ edition = "2018"
 
 [dependencies]
 tokio = "0.2.0-alpha.2"
-telegram-bot = { git = "https://github.com/telegram-rs/telegram-bot/" }
-hyper = { git = "https://github.com/hyperium/hyper.git"}
-hyper-tls = { git = "https://github.com/hyperium/hyper-tls.git"}
+telegram-bot = { git = "https://github.com/jxs/telegram-bot/", branch = "rustls"}
+hyper = "=0.13.0-alpha.1"
 futures-preview = "=0.3.0-alpha.18"
 env_logger = "0.6.2"
 log = "0.4.8"
@@ -18,3 +17,4 @@ serde = { version = "1.0", features = ["derive"] }
 serde-xml-rs = "0.3.1"
 failure = "0.1.5"
 urlencoding = "1.0.0"
+hyper-rustls = "=0.18.0-alpha.1"
