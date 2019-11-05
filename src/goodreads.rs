@@ -1,4 +1,4 @@
-use failure::{format_err, Error};
+use anyhow::{anyhow, Error};
 
 use futures::TryStreamExt;
 use hyper::{Body, Client};
@@ -67,7 +67,7 @@ impl Api {
         let body = res.into_body().try_concat().await?;
 
         let response: GoodreadsResponse = serde_xml_rs::from_reader(body.as_ref())
-            .map_err(|err| format_err!("error parsing good reads response: {}", err))?;
+            .map_err(|err| anyhow!("error parsing good reads response: {}", err))?;
 
         let results = response
             .search
