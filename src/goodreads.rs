@@ -1,7 +1,8 @@
 use failure::{format_err, Error};
 
 use futures::TryStreamExt;
-use hyper::Client;
+use hyper::{Body, Client};
+use hyper::client::HttpConnector;
 use hyper_rustls::HttpsConnector;
 use serde::Deserialize;
 use telegram_bot::{InlineQueryResult, InlineQueryResultArticle, InputTextMessageContent};
@@ -37,53 +38,47 @@ pub struct Book {
     pub small_image_url: String,
 }
 
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Debug)]
 pub struct Api {
     token: String,
+    client: Client<HttpsConnector<HttpConnector>, Body>
 }
 
 impl Api {
     pub fn new(token: &str) -> Api {
+        let https = HttpsConnector::new();
+
         Api {
             token: token.to_string(),
+            client: Client::builder().build(https),
         }
     }
 
     pub async fn search(&self, query: &str) -> Result<Vec<InlineQueryResult>, Error> {
-        goodreads_search(self.token.clone(), query.to_string()).await
+        let url = format!(
+            "https://www.goodreads.com/search/index.xml?key={}&q={}",
+            &self.token,
+            urlencoding::encode(&query)
+        )
+            .parse::<hyper::Uri>()
+            .unwrap();
+
+        let res = self.client.get(url).await?;
+        let body = res.into_body().try_concat().await?;
+
+        let response: GoodreadsResponse = serde_xml_rs::from_reader(body.as_ref())
+            .map_err(|err| format_err!("error parsing good reads response: {}", err))?;
+
+        let results = response
+            .search
+            .results
+            .works
+            .into_iter()
+            .map(work_to_article)
+            .map(From::from)
+            .collect();
+        Ok(results)
     }
-}
-
-pub async fn goodreads_search(
-    token: String,
-    query: String,
-) -> Result<Vec<InlineQueryResult>, Error> {
-    let https = HttpsConnector::new();
-    let client: Client<_, hyper::Body> = Client::builder().build(https);
-
-    let url = format!(
-        "https://www.goodreads.com/search/index.xml?key={}&q={}",
-        &token,
-        urlencoding::encode(&query)
-    )
-    .parse::<hyper::Uri>()
-    .unwrap();
-
-    let res = client.get(url).await?;
-    let body = res.into_body().try_concat().await?;
-
-    let response: GoodreadsResponse = serde_xml_rs::from_reader(body.as_ref())
-        .map_err(|err| format_err!("error parsing good reads response: {}", err))?;
-
-    let results = response
-        .search
-        .results
-        .works
-        .into_iter()
-        .map(work_to_article)
-        .map(From::from)
-        .collect();
-    Ok(results)
 }
 
 fn work_to_article(work: Work) -> InlineQueryResultArticle {
@@ -96,4 +91,5 @@ fn work_to_article(work: Work) -> InlineQueryResultArticle {
     let mut article = InlineQueryResultArticle::new(work.book.id, work.book.title, message);
     article.thumb_url(work.book.small_image_url);
     article
+
 }
